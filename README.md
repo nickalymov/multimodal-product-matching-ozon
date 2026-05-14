@@ -1,77 +1,65 @@
-# OZON-Matching-Products
-## Ozon Tech ML Competition: Product Matching
-This repository contains a solution to the product matching task based on product names, attributes, and images. The work was done as part of the Ozon Tech competition and achieved 7th solo place out of 110 teams.
-Link: [competition](https://codenrock.com/contests/e-cup-everything-as-code/leaderboards/14)
+# 📦 Ozon Multimodal Product Matching (Top 7 Solution)
 
-## 🚀 Task
-Develop a machine learning model that, given information about two products (text descriptions, images, attributes), predicts whether they are the same (target = 1) or not (target = 0).
+<p align="center">
+  <img src="./docs/img/project_demo.gif" alt="Project Demo" width="900">
+</p>
 
-## 📦 Data
-The organizers provided the following datasets:
+<p align="left">
+  <img src="https://img.shields.io/badge/Rank-7th%20out%20of%20110-gold.svg" alt="Rank">
+  <img src="https://img.shields.io/badge/Metric-ROC--AUC%200.9216-orange.svg" alt="Metric">
+  <img src="https://img.shields.io/badge/Python-3.10-green.svg" alt="Python">
+  <img src="https://img.shields.io/badge/ML-Multimodal%20Learning-blue.svg" alt="ML">
+</p>
 
-train.csv – pairs of products with a label (variantid1, variantid2, target)
+## 📌 Project Overview
+This repository contains a high-ranking solution for the **Ozon Tech ML Challenge**. The task was to solve the **Entity Resolution** problem: determining whether two different product listings represent the same physical item using a combination of textual descriptions, technical attributes, and product images.
 
-test.csv – same format, but without labels
+**Key Achievement:** Ranked **7th** solo place out of 110 teams.
 
-attributes.csv – product categories and attributes
+## 🧠 Multimodal Approach
+The core of the solution lies in effective feature fusion from three distinct data sources:
 
-text.csv – titles, descriptions, and BERT embeddings
+1.  **Textual Data (NLP):** 
+    *   Calculated string similarities (Levenshtein, Jaccard) on product names and descriptions.
+    *   Utilized pre-trained **BERT embeddings** to capture semantic meaning.
+    *   Engineered "trick" features: matching specific numeric patterns (e.g., dimensions, volumes) using Regex.
+2.  **Visual Data (Computer Vision):**
+    *   Processed **ResNet-50 embeddings** for main and additional product images.
+    *   Computed Cosine and Euclidean distances between image vectors.
+    *   Analyzed embedding entropy to detect image complexity and similarity.
+3.  **Structured Attributes:**
+    *   Parsed complex JSON attribute mappings.
+    *   Implemented category-specific feature engineering (Top-N most frequent attributes per category).
+    *   Calculated Jaccard similarity for vital vs. minor attribute keys.
 
-resnet.csv – ResNet embeddings of product images
+## 🚀 Modeling Pipeline
+I implemented two distinct modeling strategies:
 
-## 🔧 Data Processing
-Processing includes basic cleaning and feature generation based on:
+*   **AutoGluon Stacked Ensemble (Primary):** 
+    *   Used `best_quality` preset with 1 bag set and multi-layer stacking.
+    *   Achieved a peak **ROC-AUC of 0.9216**.
+    *   Models included: LightGBM, CatBoost, XGBoost, and Neural Networks.
+*   **HistGradientBoosting + Optuna (Lightweight):**
+    *   A production-friendly alternative optimized for fast inference.
+    *   Hyperparameter tuning performed via **Optuna** (TPE Sampler).
 
-Textual data: Levenshtein distance, Jaccard similarity, string length, etc.
+## 📂 Project Structure
+*   `1_main_features.py` — **Core Feature Engineering**: Logic for NLP similarities, ResNet distances, and initial attribute parsing.
+*   `2_add_cat_features.py` — **Advanced Attribute Matching**: Category-specific processing and Top-N frequent attribute extraction.
+*   `autogluon.ipynb` — **Primary Model Training**: End-to-end pipeline for AutoGluon Stacked Ensembling.
+*   `training_hgb.py` — **Lightweight Model Training**: Training HGB model with **Optuna** optimization.
+*   `ag_inference.py` — **AutoGluon Inference**: Script for generating final predictions.
+*   `hgb_inference.py` — **HGB Inference**: Fast inference pipeline for the lightweight model.
+*   `requirements.txt` — Project dependencies.
 
-Categories: matches and subcategories
+## 🛠 Tech Stack
+*   **Frameworks:** `AutoGluon`, `Scikit-learn`, `Optuna`
+*   **Data Science:** `Pandas`, `NumPy`, `SciPy`, `Tqdm`
+*   **NLP & CV:** `Levenshtein`, `Regex`, `BERT`, `ResNet`
+*   **Environment:** `PyCharm`, `Git`, `Parquet/PyArrow`
 
-Attributes: Jaccard similarity, difference in counts, binary flags
+## 🏁 Results & Analysis
+The solution demonstrated that while AutoML (AutoGluon) provides a massive boost through ensembling, the **quality of Feature Engineering** (especially handling JSON attributes and Regex-based text parsing) was the decisive factor in reaching the Top 10.
 
-Image embeddings: cosine and Euclidean distances, entropy
-
-For more details, see the notebooks:
-
-[1_main_features.ipynb](https://github.com/nickalymov/OZON-Matching-Products/blob/main/1_main_features.ipynb)
-
-[2_add_cat_features.ipynb](https://github.com/nickalymov/OZON-Matching-Products/blob/main/2_add_cat_features.ipynb)
-
-## 🧠 Models
-### 1. AutoGluon Tabular (0.9216)
-A multi-model stack with automatic ensembling. Presets used:
-
-best_quality — for maximum accuracy
-
-zeroshot — for faster experimentation
-
-Files:
-
-[autogluon.ipynb](https://github.com/nickalymov/OZON-Matching-Products/blob/main/autogluon.ipynb) – training and hyperparameter tuning
-
-[ag_inference.ipynb](https://github.com/nickalymov/OZON-Matching-Products/blob/main/ag_inference.ipynb) – loading model predictions
-
-📸 Models used within AutoGluon:
-![image](https://github.com/user-attachments/assets/02dd26a5-79e8-48d6-b932-ed624a16e689)
-
-
-### 2. HistGradientBoosting + Optuna (0.91)
-An alternative lightweight pipeline using HistGradientBoostingClassifier from sklearn, optimized with Optuna.
-
-Handles class imbalance well
-
-Minimal inference time
-
-Ready for production integration
-
-Files:
-
-[training_hgb.ipynb](https://github.com/nickalymov/OZON-Matching-Products/blob/main/training_hgb.ipynb) – training and hyperparameter tuning
-
-[hgb_inference.ipynb](https://github.com/nickalymov/OZON-Matching-Products/blob/main/hgb_inference.ipynb) – full pipeline: from raw data to predictions
-
-## 🏁 Results
-AutoGluon (stacked): ROC-AUC 0.9216 – top 7 on the leaderboard
-HistGradientBoosting + Optuna: faster, slightly lower score, but more production-friendly
-
-## 🔍 Analysis
-The solution achieved a high result due to strong feature engineering and AutoML. However, teams ranked higher in the leaderboard utilized pre-trained language models (e.g., BERT) for processing categories and attributes, which led to an improvement in quality.
+---
+*Developed by <a href="https://github.com/nickalymov" target="_blank">Nick Alymov</a>*
