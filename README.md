@@ -1,7 +1,7 @@
 # 📦 Ozon Multimodal Product Matching (Top 7 Solution)
 
 <p align="center">
-  <img src="./docs/img/project_demo.gif" alt="Project Demo" width="900">
+  <img src="project_demo.gif" alt="Project Demo" width="900">
 </p>
 
 <p align="left">
